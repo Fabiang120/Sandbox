@@ -154,6 +154,15 @@ int main(int, char**)
         ImGui::SliderFloat("Float Slider", &starting, 0.0f, 100.0f);
         ImGui::SliderInt("Int Slider", &starting1, 0, 100);
         ImGui::InputText("Name", text_chars, sizeof(text_chars));
+        ImDrawList* draw = ImGui::GetWindowDrawList();
+        ImVec2 p = ImGui::GetCursorScreenPos();
+        draw->AddRectFilled(
+            p,
+            ImVec2(p.x + 200, p.y + 100),
+            IM_COL32(255, 0, 0, 255),
+            6.0f
+        );
+        ImGui::Dummy(ImVec2(200, 100));
         ImGui::End();
 
         // Rendering
