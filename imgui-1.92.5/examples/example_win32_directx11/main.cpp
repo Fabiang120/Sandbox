@@ -11,6 +11,7 @@
 #include "imgui_impl_dx11.h"
 #include <d3d11.h>
 #include <tchar.h>
+#include "ui.h"
 
 // Data
 static ID3D11Device*            g_pd3dDevice = nullptr;
@@ -98,12 +99,14 @@ int main(int, char**)
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     // Main loop
-    bool checkboxvalue = false;
-    static float starting = 0.5;
-    static int starting1 = 10;
-    static char text_chars[64] = "";
+    UIState ui{
+        true,
+        false,
+        0.5f,
+        10,
+        ""
+    };
     bool done = false;
-    bool open = true;
     while (!done)
     {
         // Poll and handle messages (inputs, window resize, etc.)
@@ -140,30 +143,9 @@ int main(int, char**)
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
-        ImGui::SetNextWindowSize(ImVec2(600, 400));
-        ImGui::Begin("My New IMGUI App", &open, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
-        ImGui::SetCursorPosX(ImGui::GetWindowSize().x /2 - ImGui::CalcTextSize("Welcome to my new ImGui app").x / 2);
-        ImGui::Text("Welcome to my new ImGui app");
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 1.0f, 1.0f));
-        if (ImGui::Button("Click Me")) {
 
-        }
-        ImGui::PopStyleColor();
-        ImGui::SameLine();
-        ImGui::Checkbox("Magic Text", &checkboxvalue);
-        ImGui::SliderFloat("Float Slider", &starting, 0.0f, 100.0f);
-        ImGui::SliderInt("Int Slider", &starting1, 0, 100);
-        ImGui::InputText("Name", text_chars, sizeof(text_chars));
-        ImDrawList* draw = ImGui::GetWindowDrawList();
-        ImVec2 p = ImGui::GetCursorScreenPos();
-        draw->AddRectFilled(
-            p,
-            ImVec2(p.x + 200, p.y + 100),
-            IM_COL32(255, 0, 0, 255),
-            6.0f
-        );
-        ImGui::Dummy(ImVec2(200, 100));
-        ImGui::End();
+        // Our application imgui code
+        RenderUI(ui);
 
         // Rendering
         ImGui::Render();
