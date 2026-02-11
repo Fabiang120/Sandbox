@@ -13,23 +13,19 @@ struct Algorithm {
     std::string Name;
     double BlockReward;
     double BlocksPerDay;
-    double NetworkHashRate;
 };
 
 struct Miner {
     std::string MinerName;
-    std::string AlgorithmName;
     double StateElectricityCostPerKwh;
     std::string ElectricityCurrency;
     double InitialCost;
-
     // Internal
     double HashRate;
     double PowerWatts;
     Miner() = delete;
     Miner(
         const std::string& MinerName,
-        const std::string& AlgorithmName,
         double StateElectricityCostPerKwh,
         const std::string& ElectricityCurrency,
         double InitialCost,
@@ -52,6 +48,12 @@ struct MiningResult {
     );
 };
 
+struct MarketData {
+    double CoinPrice;
+    double NetworkHashRate;
+};
+
+
 Miner CreateMiner(
     const std::string& MinerName,
     double StateElectricityCostPerKwh,
@@ -61,8 +63,8 @@ Miner CreateMiner(
 
 MiningResult RunMiningSimulation(
     const Miner& MinerObject,
-    const Algorithm& AlgorihtmOjbect,
-    const Pool& PoolObject,
-    double CoinPrice
+    const Algorithm& AlgorithmObject,
+    const MarketData& MarketDataObject,
+    const Pool& PoolObject
 );
 

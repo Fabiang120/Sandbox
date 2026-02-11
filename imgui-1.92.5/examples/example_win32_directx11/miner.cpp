@@ -4,14 +4,12 @@
 
 Miner::Miner(
     const std::string& MinerName,
-    const std::string& AlgorithmName,
     double StateElectricityCostPerKwh,
     const std::string& ElectricityCurrency,
     double InitialCost,
     double HashRate,
     double PowerWatts
 ) : MinerName(MinerName),
-    AlgorithmName(AlgorithmName),
     StateElectricityCostPerKwh(StateElectricityCostPerKwh),
     ElectricityCurrency(ElectricityCurrency),
     InitialCost(InitialCost),
@@ -36,7 +34,7 @@ MiningResult::MiningResult(
 
 // Must set up later
 struct MinerSpec {
-    std::string AlgorithmName;
+    std::string SupportedAlgorithm;
     double HashRate;
     double PowerWatts;
 };
@@ -60,7 +58,6 @@ Miner CreateMiner(
 
     return Miner(
         MinerName,
-        CurrentSpec.AlgorithmName,
         StateElectricityCostPerKwh,
         ElectricityCurrency,
         InitialCost,
@@ -69,13 +66,42 @@ Miner CreateMiner(
     );
 }
 
+// Implement Algorithm and Pool creation tomorrow
+
 MiningResult RunMiningSimulation(
     const Miner& MinerObject,
-    const Algorithm& AlgorihtmOjbect,
-    const Pool& PoolObject,
-    double CoinPrice
+    const Algorithm& AlgorithmObject,
+    const MarketData& MarketDataObject,
+    const Pool& PoolObject
 ) {
+    if (MarketDataObject.NetworkHashRate <= 0.0) {
+        throw std::invalid_argument("Invalid network hashrate");
+    }
+    double CoinsPerDay =
+        (MinerObject.HashRate / MarketDataObject.NetworkHashRate) *
+        AlgorithmObject.BlockReward *
+        AlgorithmObject.BlocksPerDay;
 
+    CoinsPerDay *= (1.0 - PoolObject.FeePercent / 100.0);
+    CoinsPerDay *= (1.0 - PoolObject.StaleRatePercent / 100.0);
+
+    double RevenuePerDay =
+        CoinsPerDay * MarketDataObject.CoinPrice;
+
+    double PowerCostPerDay =
+        (MinerObject.PowerWatts / 1000.0) *
+        24.0 *
+        MinerObject.StateElectricityCostPerKwh;
+
+    double ProfitPerDay =
+        RevenuePerDay - PowerCostPerDay;
+
+    return MiningResult(
+        CoinsPerDay,
+        RevenuePerDay,
+        PowerCostPerDay,
+        ProfitPerDay
+    );
 }
 
 
